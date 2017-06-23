@@ -116,28 +116,54 @@ class Facebook
         return $me;
     }
 
-    public function postOnWall($accessToken)
+    public function postOnWall($title, $image, $accessToken)
     {
+
+
+        $data = [
+            'message' => $title,
+            'source' => $this->fb->fileToUpload($image),
+        ];
+
         try {
-
-            # Photo Caption
-            $photoCaption = 'Pracrice in SELECTO';
-
-            # Relative Path to your image.
-            $file = './images/image.png';
-
-            # Post Data for Photos API
-            $post_data = array(
-                'message' => $photoCaption,
-                'source' => $this->fb->fileToUpload($file)
-            );
-
-            $apiResponse = $this->fb->post('/me/photos', $post_data, $accessToken);
-
-        } catch (FacebookApiException $e) {
-            $user = null;
-            error_log($e);
+            // Returns a `Facebook\FacebookResponse` object
+            $response = $this->fb->post('/me/photos', $data, $accessToken);
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
         }
+
+        $graphNode = $response->getGraphNode();
+        echo($graphNode);
+
+    }
+
+    public function postLinkOnWall($title, $link, $accessToken)
+    {
+
+
+        $data = [
+            'message' => $title,
+            'link' => $link,
+        ];
+
+        try {
+            // Returns a `Facebook\FacebookResponse` object
+            $response = $this->fb->post('/me/feed', $data, $accessToken);
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+
+        $graphNode = $response->getGraphNode();
+        echo($graphNode);
+
     }
 
 }
